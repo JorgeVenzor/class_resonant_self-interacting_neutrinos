@@ -391,7 +391,7 @@ int background_functions(
   /* total non-relativistic density */
   double rho_m;
   /* background ncdm quantities */
-  double interaction_rate_of_z /*MODIFICATION Defining a new local variable */
+  double interaction_rate_of_z; /*MODIFICATION Defining a new local variable */
   double rho_ncdm,p_ncdm,pseudo_p_ncdm;
   /* index for n_ncdm species */
   int n_ncdm;
@@ -491,7 +491,7 @@ int background_functions(
   /* MODIFICATION */
   class_call(background_ncdm_interaction_rate(
                            pba,
-                           1./a_rel-1.,
+                           1./a-1.,
                            n_ncdm,
                            &interaction_rate_of_z),
                            pba->error_message,
@@ -1700,7 +1700,7 @@ int background_ncdm_interaction_rate(
     for (row=0,status=2; status==2; row++){
       status = fscanf(nsifile,"%lf %lf",&tmp1,&tmp2);
     }
-    rewind(snsifile);
+    rewind(nsifile);
     nsi_self_interaction.tablesize = row-1;
 
     /*Allocate room for interpolation table: */

@@ -101,6 +101,9 @@ cdef extern from "class.h":
         double z_eq
         double tau_eq
         double gnu
+        int index_bg_interaction_rate_of_z
+        char * ncdm_nsi_files
+        int * got_nsi_files
 
     cdef struct thermodynamics:
         ErrorMsg error_message

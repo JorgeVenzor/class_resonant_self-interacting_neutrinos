@@ -1331,7 +1331,7 @@ cdef class Class:
         if background_tau_of_z(&self.ba,z,&tau)==_FAILURE_:
             raise CosmoSevereError(self.ba.error_message)
 
-        if background_at_tau(&self.ba,tau,self.ba.long_info,self.ba.inter_normal,&last_index,pvecback)==_FAILURE_:
+        if background_at_tau(&self.ba,tau,long_info,inter_normal,&last_index,pvecback)==_FAILURE_:
             raise CosmoSevereError(self.ba.error_message)
 
         Gamma_of_z = pvecback[self.ba.index_bg_interaction_rate_of_z]
