@@ -2427,6 +2427,29 @@ int input_read_parameters_species(struct file_content * pfc,
                  entries_read,fileentries);
     }
 
+  /*START MODIFICATION Check if filenames self-interactions for interpolation tables are given: */
+class_read_list_of_integers_or_default("use_ncdm_nsi_files",pba->got_nsi_files,_FALSE_,N_ncdm);
+
+if (flag1==_TRUE_){
+  for(n=0,fileentries=0; n<N_ncdm; n++){
+    if (pba->got_nsi_files[n] == _TRUE_) fileentries++;
+  }
+
+  if (fileentries > 0) {
+
+    /* Okay, read filenames.. REMEMBER THIS IS THE MODIFICATION */
+    class_call(parser_read_list_of_strings(pfc,"ncdm_nsi_filenames",
+                                           &entries_read,&(pba->ncdm_nsi_files),&flag2,errmsg),
+               errmsg,
+               errmsg);
+    class_test(flag2 == _FALSE_,errmsg,
+               "Input use_ncdm_nsi_files is found, but no filenames found!");
+    class_test(entries_read != fileentries,errmsg,
+               "Number of filenames found, %d, does not match number of _TRUE_ values in use_ncdm_nsi_files, %d",
+               entries_read,fileentries);
+  }
+} /* END MODIFICATION */
+
     /** 5.c) (optional) p.s.d.-parameters */
     /* Read */
     parser_read_list_of_doubles(pfc,"ncdm_psd_parameters",&entries_read,&(pba->ncdm_psd_parameters),&flag1,errmsg);
@@ -2563,6 +2586,9 @@ int input_read_parameters_species(struct file_content * pfc,
   else if (pba->K < 0.){
     pba->sgnK = -1;
   }
+
+  /*MODIFICATION */
+  class_read_double("gnu", pba->gnu);
 
 
   /* 7) ** ADDITIONAL SPECIES ** --> Add your species here */

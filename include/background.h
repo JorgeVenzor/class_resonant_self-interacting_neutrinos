@@ -81,10 +81,16 @@ struct background
   double Gamma_dcdm;      /**< \f$ \Gamma_{dcdm} \f$: decay constant for decaying cold dark matter */
   double tau_dcdm;
 
+  double gnu;  /*MODIFICATION ADD NEW PARAMETER This the coupling constant of the interaction  */
+
   int N_ncdm;                            /**< Number of distinguishable ncdm species */
   /* the following parameters help to define tabulated ncdm p-s-d passed in file */
   char * ncdm_psd_files;                 /**< list of filenames for tabulated p-s-d */
   int * got_files;                       /**< list of flags for each species, set to true if p-s-d is passed through file */
+
+  char * ncdm_nsi_files; /*  MODIFICATION ths two params are needed to read the file NSI=nonstandard interaction*/
+  int * got_nsi_files;   /* MODIFICATION */
+
   /* the following parameters help to define the analytical ncdm phase space distributions (p-s-d) */
   double * ncdm_psd_parameters;          /**< list of parameters for specifying/modifying ncdm p.s.d.'s, to be customized for given model
                                               (could be e.g. mixing angles) */
@@ -196,6 +202,8 @@ struct background
   int index_bg_Omega_r;       /**< relativistic density fraction (\f$ \Omega_{\gamma} + \Omega_{\nu r} \f$) */
 
   /* end of vector in normal format, now quantities in long format */
+
+  int index_bg_interaction_rate_of_z;        /**< MODIFICATION */
 
   int index_bg_rho_crit;      /**< critical density */
   int index_bg_Omega_m;       /**< non-relativistic density fraction (\f$ \Omega_b + \Omega_cdm + \Omega_{\nu nr} \f$) */
@@ -368,6 +376,26 @@ struct background_parameters_for_distributions {
 
 };
 
+/* START MODIFICATION Here we adding some temporary paramters to read the interaction rate file */
+struct background_parameters_for_nsi {
+
+  /* structures containing fixed input parameters (indices, ...) */
+  struct background * pba;
+
+  /* Additional parameters */
+  int n_ncdm;
+
+  /* Index of current distribution function */
+
+  /* Used for interpolating in file of tabulated p-s-d: */
+  int tablesize;
+  double *z;
+  double *fixed_correction;
+  double *d2correction;
+  int last_index;
+
+};    /*END MODIFICATION */
+
 /**************************************************************/
 /* @cond INCLUDE_WITH_DOXYGEN */
 /*
@@ -466,6 +494,16 @@ extern "C" {
                            struct precision *ppr,
                            struct background *pba
                            );
+
+/* START MODIFICATION  */
+
+ int background_ncdm_interaction_rate(
+                          struct background * pba,
+                          double z,
+                          int n_ncdm,
+                          double * interaction_rate
+                                                  );
+/* END MODIFICATION    */
 
   int background_ncdm_momenta(
                              double * qvec,

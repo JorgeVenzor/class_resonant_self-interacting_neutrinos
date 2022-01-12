@@ -1311,6 +1311,35 @@ cdef class Class:
 
         return D
 
+    def Gamma_of_z(self, z):  #MODIFICATION
+        """
+        GAMMA(z)
+        Return the interaction rate GAMMA of z
+        (exactly, the quantity defined by Class as index_bg_interaction_rate_of_z
+        in the background module)
+        Parameters
+        ----------
+        z : float
+                Desired redshift
+        """
+        cdef double tau
+        cdef int last_index #junk
+        cdef double * pvecback
+
+        pvecback = <double*> calloc(self.ba.bg_size,sizeof(double))
+
+        if background_tau_of_z(&self.ba,z,&tau)==_FAILURE_:
+            raise CosmoSevereError(self.ba.error_message)
+
+        if background_at_tau(&self.ba,tau,self.ba.long_info,self.ba.inter_normal,&last_index,pvecback)==_FAILURE_:
+            raise CosmoSevereError(self.ba.error_message)
+
+        Gamma_of_z = pvecback[self.ba.index_bg_interaction_rate_of_z]
+
+        free(pvecback)
+
+        return Gamma_of_z
+
     def scale_independent_growth_factor_f(self, z):
         """
         scale_independent_growth_factor_f(z)

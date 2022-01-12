@@ -100,6 +100,7 @@ cdef extern from "class.h":
         double H_eq
         double z_eq
         double tau_eq
+        double gnu
 
     cdef struct thermodynamics:
         ErrorMsg error_message

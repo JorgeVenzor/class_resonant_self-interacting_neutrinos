@@ -8479,6 +8479,8 @@ int perturbations_derivs(double tau,
 
   /** - define local variables */
 
+  double gamma_self_interaction; /*MODIFICATION */
+
   /* multipole */
   int l;
 
@@ -9267,6 +9269,7 @@ int perturbations_derivs(double tau,
             q = pba->q_ncdm[n_ncdm][index_q];
             epsilon = sqrt(q*q+a2*pba->M_ncdm[n_ncdm]*pba->M_ncdm[n_ncdm]);
             qk_div_epsilon = k*q/epsilon;
+            gamma_self_interaction=ppw->pvecback[pba->index_bg_interaction_rate_of_z]; /*MODIFICATION Take the collision from the background*/
 
             /** - -----> ncdm density for given momentum bin */
 
@@ -9278,14 +9281,14 @@ int perturbations_derivs(double tau,
               -epsilon*metric_euler/(3*q*k)*dlnf0_dlnq;
 
             /** - -----> ncdm shear for given momentum bin */
-
+            /*MODIFICATION introduce the collision term into l=2 and l >= 3 */
             dy[idx+2] = qk_div_epsilon/5.0*(2*s_l[2]*y[idx+1]-3.*s_l[3]*y[idx+3])
-              -s_l[2]*metric_shear*2./15.*dlnf0_dlnq;
+              -s_l[2]*metric_shear*2./15.*dlnf0_dlnqa-a*pow(pba->gnu,2.)*gamma_self_interaction*(_TWOPI_*_k_B_/_h_P_)*(1./_c_)*_Mpc_over_m_*y[idx+2];
 
             /** - -----> ncdm l>3 for given momentum bin */
 
             for(l=3; l<pv->l_max_ncdm[n_ncdm]; l++){
-              dy[idx+l] = qk_div_epsilon/(2.*l+1.0)*(l*s_l[l]*y[idx+(l-1)]-(l+1.)*s_l[l+1]*y[idx+(l+1)]);
+              dy[idx+l] = qk_div_epsilon/(2.*l+1.0)*(l*s_l[l]*y[idx+(l-1)]-(l+1.)*s_l[l+1]*y[idx+(l+1)])-a*pow(pba->gnu,2.)*gamma_self_interaction*(_TWOPI_*_k_B_/_h_P_)*(1./_c_)*_Mpc_over_m_*y[idx+l];
             }
 
             /** - -----> ncdm lmax for given momentum bin (truncation as in Ma and Bertschinger)

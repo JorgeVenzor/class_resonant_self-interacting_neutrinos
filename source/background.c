@@ -391,6 +391,7 @@ int background_functions(
   /* total non-relativistic density */
   double rho_m;
   /* background ncdm quantities */
+  double interaction_rate_of_z /*MODIFICATION Defining a new local variable */
   double rho_ncdm,p_ncdm,pseudo_p_ncdm;
   /* index for n_ncdm species */
   int n_ncdm;
@@ -486,6 +487,19 @@ int background_functions(
 
     /* Loop over species: */
     for(n_ncdm=0; n_ncdm<pba->N_ncdm; n_ncdm++) {
+
+  /* MODIFICATION */
+  class_call(background_ncdm_interaction_rate(
+                           pba,
+                           1./a_rel-1.,
+                           n_ncdm,
+                           &interaction_rate_of_z),
+                           pba->error_message,
+                           pba->error_message);
+
+  pvecback[pba->index_bg_interaction_rate_of_z+n_ncdm] = interaction_rate_of_z;
+  /*pvecback[pba->index_bg_m_in_eV_of_z+n_ncdm]=_k_B_/_eV_*pba->T_ncdm[n_ncdm]*M_of_z*pba->T_cmb;
+  /* END MODIFICATION */
 
       /* function returning background ncdm[n_ncdm] quantities (only
          those for which non-NULL pointers are passed) */
@@ -940,6 +954,12 @@ int background_free_input(
       free(pba->ncdm_psd_files);
     if (pba->ncdm_psd_parameters!=NULL)
       free(pba->ncdm_psd_parameters);
+    /*START MODIFICATION  free the variables used to read the files*/
+    if (pba->got_nsi_files!=NULL)
+      free(pba->got_nsi_files);
+    if (pba->ncdm_nsi_files!=NULL)
+      free(pba->ncdm_nsi_files);
+    /*END MODIFICATION*/
   }
 
   if (pba->Omega0_scf != 0.) {
@@ -1046,6 +1066,7 @@ int background_indices(
   /* - indices for ncdm. We only define the indices for ncdm1
      (density, pressure, pseudo-pressure), the other ncdm indices
      are contiguous */
+  class_define_index(pba->index_bg_interaction_rate_of_z,pba->has_ncdm,index_bg,pba->N_ncdm); /* MODIFICATION THIS SAVES THE INT RATE */
   class_define_index(pba->index_bg_rho_ncdm1,pba->has_ncdm,index_bg,pba->N_ncdm);
   class_define_index(pba->index_bg_p_ncdm1,pba->has_ncdm,index_bg,pba->N_ncdm);
   class_define_index(pba->index_bg_pseudo_p_ncdm1,pba->has_ncdm,index_bg,pba->N_ncdm);
@@ -1652,6 +1673,106 @@ int background_ncdm_momenta(
   return _SUCCESS_;
 }
 
+/* START MODIFICATION, read the new file Gamma(z) which is the interaction rate as a function of z */
+/*This is the most important part in the MODIFICATION */
+int background_ncdm_interaction_rate(
+                         struct background * pba,
+                         double z,
+                         int n_ncdm,
+                         double * interaction_rate
+                       ){
+  int row,status;
+  double tmp1,tmp2;
+  struct background_parameters_for_nsi nsi_self_interaction;
+  FILE *nsifile;
+  nsi_self_interaction.pba = pba; /* extract the background structure from it */
+  double local_correction,logzeta,loglocalcorr;
+  int lastidx;
+  nsi_self_interaction.n_ncdm = n_ncdm;
+  nsi_self_interaction.z = NULL;
+  nsi_self_interaction.tablesize = 0;
+
+  if ((pba->got_nsi_files!=NULL)&&(pba->got_nsi_files[n_ncdm]==_TRUE_)){
+    nsifile = fopen("resonance_interaction_1_eV.dat","r");
+    class_test(nsifile == NULL,pba->error_message,
+               "Could not open file %s!",pba->ncdm_nsi_files+_ARGUMENT_LENGTH_MAX_);
+    // Find size of table:
+    for (row=0,status=2; status==2; row++){
+      status = fscanf(nsifile,"%lf %lf",&tmp1,&tmp2);
+    }
+    rewind(snsifile);
+    nsi_self_interaction.tablesize = row-1;
+
+    /*Allocate room for interpolation table: */
+    class_alloc(nsi_self_interaction.z,sizeof(double)*nsi_self_interaction.tablesize,pba->error_message);
+    class_alloc(nsi_self_interaction.fixed_correction,sizeof(double)*nsi_self_interaction.tablesize,pba->error_message);
+    class_alloc(nsi_self_interaction.d2correction,sizeof(double)*nsi_self_interaction.tablesize,pba->error_message);
+    for (row=0; row<nsi_self_interaction.tablesize; row++){
+      status = fscanf(nsifile,"%lf %lf",
+                      &nsi_self_interaction.z[row],&nsi_self_interaction.fixed_correction[row]);
+    }
+    fclose(nsifile);
+    /* Call spline interpolation: */
+    class_call(array_spline_table_lines(nsi_self_interaction.z,
+                                        nsi_self_interaction.tablesize,
+                                        nsi_self_interaction.fixed_correction,
+                                        1,
+                                        nsi_self_interaction.d2correction,/*This seem the output of this*/
+                                        _SPLINE_EST_DERIV_,
+                                        pba->error_message),
+               pba->error_message,
+               pba->error_message);
+
+  if(z==0){
+        logzeta=-100.;
+  }
+  else {
+        logzeta=log10(z);
+
+  }
+
+  lastidx = nsi_self_interaction.tablesize-1;
+  if(logzeta<nsi_self_interaction.z[0]){
+    //Handle z->0 case if the value of z is smaller than the value of zmin in the table just take the interation value for that zmin:
+    local_correction=pow(10.,nsi_self_interaction.fixed_correction[0]);
+    *interaction_rate =local_correction;
+  }
+  else if(logzeta>nsi_self_interaction.z[lastidx]){
+    //Handle z>zmax, just take the maximum value
+    local_correction=pow(10.,nsi_self_interaction.fixed_correction[lastidx]);
+    *interaction_rate =local_correction;
+  }
+  else{
+    //Do interpolation:
+    class_call(array_interpolate_spline(
+                                        nsi_self_interaction.z,
+                                        nsi_self_interaction.tablesize,
+                                        nsi_self_interaction.fixed_correction,
+                                        nsi_self_interaction.d2correction,
+                                        1,
+                                        logzeta,
+                                        &nsi_self_interaction.last_index,
+                                        &loglocalcorr,
+                                        1,
+                                        pba->error_message),
+               pba->error_message,      pba->error_message);
+
+   local_correction=pow(10.,loglocalcorr);
+   *interaction_rate=local_correction;
+}
+
+free(nsi_self_interaction.z);
+free(nsi_self_interaction.fixed_correction);
+free(nsi_self_interaction.d2correction);
+} /*Here the starting if is closed */
+else{
+
+  *interaction_rate=0.0;
+
+}
+return _SUCCESS_;
+}      /* END MODIFICATION */
+
 /**
  * When the user passed the density fraction Omega_ncdm or
  * omega_ncdm in input but not the mass, infer the mass with Newton iteration method.
@@ -1660,6 +1781,8 @@ int background_ncdm_momenta(
  * @param pba    Input/Output: background structure
  * @param n_ncdm Input: index of ncdm species
  */
+
+
 
 int background_ncdm_M_from_Omega(
                                  struct precision *ppr,
