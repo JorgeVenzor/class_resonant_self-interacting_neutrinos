@@ -304,12 +304,12 @@ class_precision_parameter(perturbations_integration_stepsize,double,0.5)
 /**
  * default step \f$ d \tau \f$ for sampling the source function, in units of the timescale involved in the sources: \f$ (\dot{\kappa}- \ddot{\kappa}/\dot{\kappa})^{-1} \f$
  */
-class_precision_parameter(perturbations_sampling_stepsize,double,0.1)
+class_precision_parameter(perturbations_sampling_stepsize,double,0.05)
 /**
  * control parameter for the precision of the perturbation integration,
  * IMPORTANT FOR SETTING THE STEPSIZE OF NDF15
  */
-class_precision_parameter(tol_perturbations_integration,double,1.0e-5)
+class_precision_parameter(tol_perturbations_integration,double,1.0e-7)
 /**
  * cutoff relevant for controlling stiffness in the PPF scheme. It is
  * neccessary for the Runge-Kutta evolver, but not for ndf15. However,
@@ -400,7 +400,7 @@ class_precision_parameter(l_linstep,int,40) /**< factor for logarithmic spacing 
 class_precision_parameter(l_logstep,double,1.12) /**< maximum spacing of values of l over which Bessel and transfer functions are sampled (so, spacing becomes linear instead of logarithmic at some point) */
 
 class_precision_parameter(hyper_x_min,double,1.0e-5)  /**< flat case: lower bound on the smallest value of x at which we sample \f$ \Phi_l^{\nu}(x)\f$ or \f$ j_l(x)\f$ */
-class_precision_parameter(hyper_sampling_flat,double,8.0)  /**< flat case: number of sampled points x per approximate wavelength \f$ 2\pi \f$, should remain >7.5 */
+class_precision_parameter(hyper_sampling_flat,double,9.0)  /**< flat case: number of sampled points x per approximate wavelength \f$ 2\pi \f$, should remain >7.5 */
 class_precision_parameter(hyper_sampling_curved_low_nu,double,7.0)  /**< open/closed cases: number of sampled points x per approximate wavelength \f$ 2\pi/\nu\f$, when \f$ \nu \f$ smaller than hyper_nu_sampling_step */
 class_precision_parameter(hyper_sampling_curved_high_nu,double,3.0) /**< open/closed cases: number of sampled points x per approximate wavelength \f$ 2\pi/\nu\f$, when \f$ \nu \f$ greater than hyper_nu_sampling_step */
 class_precision_parameter(hyper_nu_sampling_step,double,1000.0)  /**< open/closed cases: value of nu at which sampling changes  */

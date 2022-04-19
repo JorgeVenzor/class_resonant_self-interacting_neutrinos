@@ -34,7 +34,7 @@ common_settings = {# we need to set the output field to something although
                 # Take fixed value for primordial Helium (instead of automatic BBN adjustment)
                    'YHe': 0.2454006,
                    'gnu':str(gnu).strip('[]'),
-                   'use_ncdm_nsi_files':'1',
+                   'use_ncdm_nsi_files': 1,
                    'ncdm_nsi_filenames':filename,
                    'ncdm_fluid_approximation':3,
                    'YHe':0.25,
@@ -46,10 +46,10 @@ common_settings = {# we need to set the output field to something although
 #
 # call CLASS
 #
-M2 = {}
-all_k2 = {}
-one_k2 = {}
-background2 = {}
+M = {}
+all_k = {}
+one_k = {}
+background = {}
 var_array = gnu
 var_num = len(var_array)
 
@@ -58,13 +58,13 @@ for i, gnu in enumerate(var_array):
     print (' * Compute with %s=%e ' %('gnu', gnu))
     # call CLASS
     #
-    M2[i] = Class()
-    M2[i].set(common_settings)
-    M2[i].set({'gnu':gnu,'modes':'s,t'})
-    M2[i].compute()
+    M[i] = Class()
+    M[i].set(common_settings)
+    M[i].set({'gnu':gnu,'modes':'s,t'})
+    M[i].compute()
     #load perturbations
-    all_k2[i]=M2[i].get_perturbations()
-    one_k2[i]=all_k2[i]['scalar']
-    background[i] = M2[i].get_background()
+    all_k[i]=M[i].get_perturbations()
+    one_k[i]=all_k[i]['scalar']
+    background[i] = M[i].get_background()
 
     ###
