@@ -309,7 +309,7 @@ class_precision_parameter(perturbations_sampling_stepsize,double,0.05)
  * control parameter for the precision of the perturbation integration,
  * IMPORTANT FOR SETTING THE STEPSIZE OF NDF15
  */
-class_precision_parameter(tol_perturbations_integration,double,1.0e-7)
+class_precision_parameter(tol_perturbations_integration,double,0.5e-5)
 /**
  * cutoff relevant for controlling stiffness in the PPF scheme. It is
  * neccessary for the Runge-Kutta evolver, but not for ndf15. However,
