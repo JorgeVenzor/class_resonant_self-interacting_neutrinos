@@ -82,6 +82,7 @@ struct background
   double tau_dcdm;
 
   double gnu;  /*MODIFICATION ADD NEW PARAMETER This the coupling constant of the interaction  */
+  double m_med_in_eV; /*MODIFICATION mediator mass in eV  */
 
   int N_ncdm;                            /**< Number of distinguishable ncdm species */
   /* the following parameters help to define tabulated ncdm p-s-d passed in file */

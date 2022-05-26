@@ -101,6 +101,7 @@ cdef extern from "class.h":
         double z_eq
         double tau_eq
         double gnu
+        double m_med_in_eV
         int index_bg_interaction_rate_of_z
         char * ncdm_nsi_files
         int * got_nsi_files
