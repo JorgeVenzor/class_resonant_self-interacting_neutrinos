@@ -1735,7 +1735,7 @@ int background_ncdm_interaction_rate(
   lastidx = nsi_self_interaction.tablesize-1;
 
   photon_temp_today=8.617333e-5*2.7255; /* photon temp in eV today  */
-  z_cut =pba->m_med_in_eV/1.43/photon_temp_today;/*the reference value of z cut */
+  z_cut =pba->m_med_in_eV/1.43/photon_temp_today-1;/*the reference value of z cut */
 
   if (z<z_cut){
       if(logzeta<nsi_self_interaction.z[0]){
@@ -1760,7 +1760,7 @@ int background_ncdm_interaction_rate(
         table_interaction=pow(10.,loglocalcorr);
         }
 
-      local_correction=pow(pba->gnu,2.)*table_interaction+0.43*0.71*pow(pba->gnu,4.)*photon_temp_today*pow(1.+z,5.)/pow(pba->pba->m_med_in_eV,4.)
+      local_correction=pow(pba->gnu,2.)*table_interaction+0.43*0.71*pow(pba->gnu,4.)*photon_temp_today*pow(1.+z,5.)/pow(pba->pba->m_med_in_eV,4.);
       *interaction_rate =local_correction;
 }
 
@@ -1786,7 +1786,7 @@ int background_ncdm_interaction_rate(
 
        table_interaction=pow(10.,loglocalcorr);
        }
-       local_correction=pow(pba->gnu,2.)*table_interaction+0.183*pow(pba->gnu,4.)*0.71*photon_temp_today*(1.+z)
+       local_correction=pow(pba->gnu,2.)*table_interaction+0.183*pow(pba->gnu,4.)*0.71*photon_temp_today*(1.+z);
        *interaction_rate =local_correction;
   }
 
