@@ -1737,12 +1737,15 @@ int background_ncdm_interaction_rate(
   photon_temp_today=8.617333e-5*2.7255; /* photon temp in eV today  */
   z_cut =pba->m_med_in_eV/1.43/photon_temp_today-1;/*the reference value of z cut */
 
-  if (z<z_cut){
-      if(logzeta<nsi_self_interaction.z[0]){
-      //Handle z->0 case if the value of z is smaller than the value of zmin in the table just take the interation value for that zmin:
+  if(logzeta<nsi_self_interaction.z[0]){
+  //Handle z->0 case if the value of z is smaller than the value of zmin in the table just take the interation value for that zmin:
       table_interaction=pow(10.,nsi_self_interaction.fixed_correction[0]);
-      }
-      else{
+  }
+  else if(logzeta>nsi_self_interaction.z[lastidx]){
+   //Handle z>zmax, just take the maximum value
+   table_interaction=pow(10.,nsi_self_interaction.fixed_correction[lastidx]);
+  }
+  else {
         //Do interpolation:
         class_call(array_interpolate_spline(
                                             nsi_self_interaction.z,
@@ -1758,38 +1761,15 @@ int background_ncdm_interaction_rate(
                    pba->error_message,      pba->error_message);
 
         table_interaction=pow(10.,loglocalcorr);
-        }
-
-      local_correction=pow(pba->gnu,2.)*table_interaction+0.43*0.71*pow(pba->gnu,4.)*photon_temp_today*pow(1.+z,5.)/pow(pba->pba->m_med_in_eV,4.);
-      *interaction_rate =local_correction;
-}
-
-  else if (z>z_cut){
-     if(logzeta>nsi_self_interaction.z[lastidx]){
-      //Handle z>zmax, just take the maximum value
-      table_interaction=pow(10.,nsi_self_interaction.fixed_correction[lastidx]);
-     }
-     else{
-       //Do interpolation:
-       class_call(array_interpolate_spline(
-                                           nsi_self_interaction.z,
-                                           nsi_self_interaction.tablesize,
-                                           nsi_self_interaction.fixed_correction,
-                                           nsi_self_interaction.d2correction,
-                                           1,
-                                           logzeta,
-                                           &nsi_self_interaction.last_index,
-                                           &loglocalcorr,
-                                           1,
-                                           pba->error_message),
-                  pba->error_message,      pba->error_message);
-
-       table_interaction=pow(10.,loglocalcorr);
-       }
-       local_correction=pow(pba->gnu,2.)*table_interaction+0.183*pow(pba->gnu,4.)*0.71*photon_temp_today*(1.+z);
-       *interaction_rate =local_correction;
   }
-
+  if (z<z_cut){
+  local_correction=pow(pba->gnu,2.)*table_interaction+0.43*0.71*pow(pba->gnu,4.)*photon_temp_today*pow(1.+z,5.)/pow(pba->pba->m_med_in_eV,4.);
+  }
+  else{
+  local_correction=pow(pba->gnu,2.)*table_interaction+0.183*pow(pba->gnu,4.)*0.71*photon_temp_today*(1.+z);
+  }
+  
+  *interaction_rate =local_correction;
 
 free(nsi_self_interaction.z);
 free(nsi_self_interaction.fixed_correction);
