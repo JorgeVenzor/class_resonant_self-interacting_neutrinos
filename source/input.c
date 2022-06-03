@@ -2590,7 +2590,7 @@ class_read_list_of_integers_or_default("use_ncdm_nsi_files",pba->got_nsi_files,_
 
   /*MODIFICATION */
   class_read_double("gnu", pba->gnu);
-
+  class_read_double("m_med_in_eV", pba->m_med_in_eV);
 
   /* 7) ** ADDITIONAL SPECIES ** --> Add your species here */
 
