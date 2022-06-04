@@ -1763,7 +1763,7 @@ int background_ncdm_interaction_rate(
         table_interaction=pow(10.,loglocalcorr);
   }
   if (z<z_cut){
-  local_correction=pow(pba->gnu,2.)*table_interaction+0.43*0.71*pow(pba->gnu,4.)*pow(photon_temp_today*(1.+z),5.)/pow(pba->pba->m_med_in_eV,4.);
+  local_correction=pow(pba->gnu,2.)*table_interaction+0.43*0.71*pow(pba->gnu,4.)*photon_temp_today*pow(1.+z,5.)/pow(pba->pba->m_med_in_eV,4.);
   }
   else{
   local_correction=pow(pba->gnu,2.)*table_interaction+0.183*pow(pba->gnu,4.)*0.71*photon_temp_today*(1.+z);
