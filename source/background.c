@@ -1763,7 +1763,7 @@ int background_ncdm_interaction_rate(
         table_interaction=pow(10.,loglocalcorr);
   }
   if (z<z_cut){
-  local_correction=pow(pba->gnu,2.)*table_interaction+0.43*0.71*pow(pba->gnu,4.)*pow(photon_temp_today*(1.+z),5.)/pow(pba->pba->m_med_in_eV,4.);
+  local_correction=pow(pba->gnu,2.)*table_interaction+0.43*0.71*pow(pba->gnu,4.)*pow(photon_temp_today*(1.+z),5.)/pow(pba->m_med_in_eV,4.);
   }
   else{
   local_correction=pow(pba->gnu,2.)*table_interaction+0.183*pow(pba->gnu,4.)*0.71*photon_temp_today*(1.+z);
@@ -2571,6 +2571,7 @@ int background_output_titles(
   class_store_columntitle(titles,"(.)rho_b",_TRUE_);
   class_store_columntitle(titles,"(.)rho_cdm",pba->has_cdm);
   if (pba->has_ncdm == _TRUE_) {
+    class_store_columntitle(titles,"(.)Gamma_of_z",_TRUE_);/**Modification*/
     for (n=0; n<pba->N_ncdm; n++) {
       sprintf(tmp,"(.)rho_ncdm[%d]",n);
       class_store_columntitle(titles,tmp,_TRUE_);
@@ -2646,6 +2647,7 @@ int background_output_data(
     class_store_double(dataptr,pvecback[pba->index_bg_rho_b],_TRUE_,storeidx);
     class_store_double(dataptr,pvecback[pba->index_bg_rho_cdm],pba->has_cdm,storeidx);
     if (pba->has_ncdm == _TRUE_) {
+      class_store_double(dataptr,pvecback[pba->index_bg_interaction_rate_of_z],_TRUE_,storeidx); /**Modification:store interaction rate*/
       for (n=0; n<pba->N_ncdm; n++) {
         class_store_double(dataptr,pvecback[pba->index_bg_rho_ncdm1+n],_TRUE_,storeidx);
         class_store_double(dataptr,pvecback[pba->index_bg_p_ncdm1+n],_TRUE_,storeidx);
