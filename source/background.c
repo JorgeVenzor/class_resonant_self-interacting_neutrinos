@@ -1694,9 +1694,9 @@ int background_ncdm_interaction_rate(
   nsi_self_interaction.tablesize = 0;
 
   if ((pba->got_nsi_files!=NULL)&&(pba->got_nsi_files[n_ncdm]==_TRUE_)){
-    nsifile = fopen("resonance_interaction_1_eV.dat","r");
+    nsifile = fopen(pba->ncdm_nsi_files,"r");
     class_test(nsifile == NULL,pba->error_message,
-               "Could not open file %s!",pba->ncdm_nsi_files+_ARGUMENT_LENGTH_MAX_);
+               "Cannot open file %s!",pba->ncdm_nsi_files);
     // Find size of table:
     for (row=0,status=2; status==2; row++){
       status = fscanf(nsifile,"%lf %lf",&tmp1,&tmp2);
