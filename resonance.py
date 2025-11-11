@@ -1,45 +1,18 @@
-import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import special
-from scipy.integrate import odeint
 from scipy.integrate import quad
-from scipy.optimize import curve_fit
-from scipy.optimize import minimize
-from scipy import interpolate
-import xlrd
-from scipy.interpolate import splev, splrep, interp1d
-from astropy import constants as const
-from scipy import optimize as op
-import scipy.integrate as spi
-import scipy.stats as statspy
-import scipy.signal
-from decimal import Decimal
-def fmt(xp, pos):
-    a, b = '{:.0e}'.format(xp).split('e')
-    b = int(b)
-    return r'${} \times 10^{{{}}}$'.format(a, b)
-def fmt_2(xp):
-    T_photon0=kb*Tgamma0
-    V=(xp+1)*T_photon0
-    a, b = '{:.0e}'.format(V).split('e')
-    b = int(b)
-    return r'$10^{{{}}}$'.format(b)
 
 hbar =6.5821e-16 # (eV*s)
 c=3e8 #(m/s)
-NA=6.02214076e23 #Avogadro's number
 kb =8.6173e-05 #(eV/K)
-mb = 0.9382e09 # baryon mass in eV (proton mass)
-m_e=0.501e6 #electron mass in eV
-rho0crit= 7.9092e-11 #the critical density is this value multiplied by h^2
 Tgamma0=2.7255 # in Kelvin
 
 def neutrino_number_density(T):
     """
     The neutrino number density in the units of T
     """
-    number= (6*scipy.special.zeta(3)*T**3)/(4*np.pi**2.)
+    number= (3*special.zeta(3)*T**3)/(2*np.pi**2.)
     return number
 
 def G_integration(x,s,T):
@@ -50,7 +23,7 @@ def G_integration(x,s,T):
     up_arg=1+np.exp((-1/2)*(x+A))
     down_arg=1+np.exp((-1/2)*(x-A))
     arg=up_arg/down_arg
-    func=np.exp(-x)*(A+np.log(arg))/(1-np.exp(-x))
+    func=np.exp(-x)*(A/2+np.log(arg))/(1-np.exp(-x))
     return func
 
 def F_vassh(s,T):
@@ -113,7 +86,7 @@ def save_data_files(save,mphi,zmin,zmax,name,g=1):
     save a
     """
     name=str(name)
-    z=np.logspace(np.log10(zmin),np.log10(zmax),20)
+    z=np.logspace(np.log10(zmin),np.log10(zmax),40)
     logz=np.log10(z)
     T=Tgamma0*kb*(1.+z)
     y=np.zeros(T.size)
@@ -124,3 +97,5 @@ def save_data_files(save,mphi,zmin,zmax,name,g=1):
     if save:
         np.savetxt(name,array)
     return 0
+
+#save_data_files(True,0.01,0.07,1e12,'tables_Gamma_resonance/resonance_interaction_10minus2_eV.dat')

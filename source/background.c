@@ -1687,7 +1687,7 @@ int background_ncdm_interaction_rate(
   FILE *nsifile;
   nsi_self_interaction.pba = pba; /* extract the background structure from it */
   double local_correction,logzeta,loglocalcorr;
-  double table_interaction,z_cut, photon_temp_today;
+  double table_interaction, photon_temp_today;
   int lastidx;
   nsi_self_interaction.n_ncdm = n_ncdm;
   nsi_self_interaction.z = NULL;
@@ -1735,7 +1735,6 @@ int background_ncdm_interaction_rate(
   lastidx = nsi_self_interaction.tablesize-1;
 
   photon_temp_today=8.617333e-5*2.7255; /* photon temp in eV today  */
-  z_cut =pba->m_med_in_eV/1.43/photon_temp_today-1;/*the reference value of z cut */
 
   if(logzeta<nsi_self_interaction.z[0]){
   //Handle z->0 case if the value of z is smaller than the value of zmin in the table just take the interation value for that zmin:
@@ -1762,12 +1761,8 @@ int background_ncdm_interaction_rate(
 
         table_interaction=pow(10.,loglocalcorr);
   }
-  if (z<z_cut){
-  local_correction=pow(pba->gnu,2.)*table_interaction+0.43*0.71*pow(pba->gnu,4.)*pow(photon_temp_today*(1.+z),5.)/pow(pba->m_med_in_eV,4.);
-  }
-  else{
-  local_correction=pow(pba->gnu,2.)*table_interaction+0.183*pow(pba->gnu,4.)*0.71*photon_temp_today*(1.+z);
-  }
+  
+  local_correction=pow(pba->gnu,2.)*table_interaction;
 
   *interaction_rate =local_correction;
 
