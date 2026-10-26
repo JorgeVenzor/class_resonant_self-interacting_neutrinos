@@ -1,7 +1,6 @@
-# CLASS with self-interacting neutrinos   
+# CLASS with resonant self-interacting neutrinos   
 
-This is a modified version of the CLASS code v3.1 (see http://class-code.net and https://github.com/lesgourg/class_public). It computes the interaction rate of resonant neutrino self-interactions. 
-It computes the neutrino distribution pertubations at linear order.
+This is a modified version of the CLASS code v3.1 (see http://class-code.net and https://github.com/lesgourg/class_public). It computes the interaction rate of resonant neutrino self-interactions and the neutrino distribution pertubations at linear order.
 
 The implementation is based on: 
 https://arxiv.org/abs/2303.12792
